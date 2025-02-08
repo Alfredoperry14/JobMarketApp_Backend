@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Function to scrape jobs from Indeed
 def scrape_jobs():
-    url = "https://www.indeed.com/jobs?q=software+engineer&l=New+York"  # Update search query as needed
+    url = "https://www.indeed.com/jobs?q=Software+Engineer&l=New+York%2C+NY&radius=5"  # Update search query as needed
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }

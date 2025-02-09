@@ -25,6 +25,7 @@ class Job(Base):
     location = Column(String, nullable=False)
     job_type = Column(String, nullable=False)
     post_date = Column(Date, nullable=False)
+    job_link = Column(String, nullable=False)
 
 # Function to initialize the database
 def init_db():

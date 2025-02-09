@@ -1,5 +1,6 @@
 import time
 import random
+from datetime import datetime, timedelta
 import re
 from datetime import datetime
 from bs4 import BeautifulSoup
@@ -127,13 +128,15 @@ def scrape_jobs():
         print(f"Scraped Job: {title} at {company_name}, Location: {job_location}, "
               f"Posted: {post_date_text}, Level: {job_level}, Salary: {avg_salary}")
 
+        actual_post_date = get_actual_date(post_date_text)
+        
         job_entry = Job(
             company=company_name,
             title=title,
             salary=avg_salary,
             location=job_location,
             job_type=job_level,
-            post_date=datetime.today().date()
+            post_date=actual_post_date,
         )
         db.add(job_entry)
 
@@ -143,3 +146,29 @@ def scrape_jobs():
 
 if __name__ == "__main__":
     scrape_jobs()
+    
+    
+def get_actual_date(post_date_text): 
+    """Convert a relative time string into an absolute date."""
+    today = datetime.today().date()
+    
+    # Handle common cases
+    if "Today" in post_date_text or "Just now" in post_date_text:
+        return today
+    elif "Yesterday" in post_date_text:
+        return today - timedelta(days=1)
+    
+    # Look for patterns like "2 Days Ago" (or "2 Day Ago") using regex
+    match = re.search(r'(\d+)\s+day', post_date_text, re.IGNORECASE)
+    if match:
+        days_ago = int(match.group(1))
+        return today - timedelta(days=days_ago)
+    
+    # You can add more parsing logic here if needed (e.g., for hours)
+    # For hours, you might decide that it’s still today:
+    match = re.search(r'(\d+)\s+hour', post_date_text, re.IGNORECASE)
+    if match:
+        return today  # Still the same day
+    
+    # Fallback: if no pattern matched, default to today
+    return today

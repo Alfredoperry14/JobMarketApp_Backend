@@ -37,7 +37,7 @@ def get_actual_date(post_date_text):
 
 def scrape_jobs():
     base_url = "https://www.builtinnyc.com/jobs?search=software+engineer"
-    page_number = 1
+    page_number = 5
 
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")

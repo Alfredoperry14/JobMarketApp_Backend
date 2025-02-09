@@ -36,7 +36,7 @@ def get_actual_date(post_date_text):
     return today
 
 def scrape_jobs():
-    base_url = "https://www.builtinnyc.com/jobs/dev-engineering"
+    base_url = "https://www.builtinnyc.com/jobs/dev-engineering?"
     page_number = 1
 
     chrome_options = Options()
@@ -174,6 +174,7 @@ def scrape_jobs():
                 job_link=job_link  
             )
             db.add(job_entry)
+            db.flush()
 
         page_number += 1  # Move to the next page
 

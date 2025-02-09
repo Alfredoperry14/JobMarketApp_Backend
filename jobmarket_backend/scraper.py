@@ -103,6 +103,13 @@ def scrape_jobs():
             if job_link != "N/A" and not job_link.startswith("http"):
                 job_link = "https://www.builtinnyc.com" + job_link
 
+            # Check that we haven't added the job link before
+            existing_link = db.query(Job).filter(Job.job_link == job_link).first()
+            if existing_link:
+                print(f"Job already exists in DB: {job_link}")
+                continue  # Skip to the next job in the loop
+
+
             # Extract job location (Remote/Hybrid)
             location_icon = job.find("i", class_=["fa-regular", "fa-location-dot"])
             job_location = "N/A"

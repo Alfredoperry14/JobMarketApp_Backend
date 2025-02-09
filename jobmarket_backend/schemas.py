@@ -10,6 +10,7 @@ class JobBase(BaseModel):
     location: str
     job_type: str
     post_date: date
+    job_link: str
 
 # ✅ Schema for creating a job (Request Model)
 class JobCreate(JobBase):

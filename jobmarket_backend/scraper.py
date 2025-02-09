@@ -75,29 +75,29 @@ def scrape_jobs():
         title = job_title.get_text(strip=True) if job_title else "N/A"
 
             
-        location_icon = job.find("i", class_="fa-regular fa-location-dot")
+        location_icon = job.find("i", class_=["fa-regular", "fa-location-dot"])
         job_location = "N/A"
         if location_icon:
-            parent_div = clock_icon.find_parent("div")
+            parent_div = location_icon.find_parent("div")
             if parent_div:
                 next_div = parent_div.find_next_sibling("div")
                 if next_div:
                     location_span = next_div.find("span")
                     if location_span:
-                        post_date_text = post_date_span.get_text(strip=True)
+                        job_location = location_span.get_text(strip=True)
         
         
         # Find the clock icon
         clock_icon = job.find("i", class_=["fa-regular", "fa-clock"])
+        post_date_text = "N/A"  # Default value if posting date is not found
         if clock_icon:
             # Get the parent <span> element
             parent_span = clock_icon.find_parent("span")
             if parent_span:
                 # Extract all the text within the parent <span>
                 post_date_text = parent_span.get_text(strip=True)
-                print("Full text from parent span:", full_text)
                         
-        job_level = None
+        job_level = "N/A"
         for span in job.find_all("span", class_="font-barlow text-gray-04"):
             text = span.get_text(strip=True)
             if "level" in text:

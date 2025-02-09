@@ -72,7 +72,7 @@ def scrape_jobs():
         time.sleep(5)
 
         # Minor mouse movement to simulate human behavior
-        ActionChains(driver).move_by_offset(100, 200).perform()
+        #ActionChains(driver).move_by_offset(100, 200).perform()
         time.sleep(random.uniform(2, 5))
 
         # Get the updated page source and parse with BeautifulSoup

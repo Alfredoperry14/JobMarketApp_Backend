@@ -74,7 +74,7 @@ def scrape_jobs():
         job_title = job.find("a", {"data-id": "job-card-title"})
         title = job_title.get_text(strip=True) if job_title else "N/A"
 
-            
+        #Remote/Hybrid
         location_icon = job.find("i", class_=["fa-regular", "fa-location-dot"])
         job_location = "N/A"
         if location_icon:

@@ -1,84 +1,148 @@
-import requests
-from bs4 import BeautifulSoup
-from database import SessionLocal, Job
+import time
+import random
+import re
 from datetime import datetime
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from database import SessionLocal, Job
 
-# Function to scrape jobs from Indeed
 def scrape_jobs():
-    url = "https://www.indeed.com/jobs?q=Software+Engineer&l=New+York%2C+NY&radius=5"  # Update search query as needed
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print("Failed to retrieve jobs")
+    url = "https://www.builtinnyc.com/jobs?search=software+engineer"
+
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("start-maximized")
+    chrome_options.add_argument("disable-infobars")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(url)
+
+    # Wait for job cards to load
+    try:
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-id='job-card']"))
+        )
+        time.sleep(7)  # Extra wait for JavaScript to finish rendering
+    except Exception as e:
+        print("Error waiting for job content to load:", e)
+
+    # Simulate scrolling to the bottom to force lazy loading (if any)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(5)
+
+    # Minor mouse movement to simulate human behavior
+    ActionChains(driver).move_by_offset(100, 200).perform()
+    time.sleep(random.uniform(2, 5))
+
+    # Get the updated page source and quit the browser
+    html = driver.page_source
+    driver.quit()
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Debug: print snippet of page source to check for job cards
+    print("Page source snippet:")
+    print(soup.prettify()[:2000])
+
+    # Use a generic selector for job cards
+    job_listings = soup.select("div[data-id='job-card']")
+    print(f"Found {len(job_listings)} jobs")
+
+    if len(job_listings) == 0:
+        print("No jobs found. The website structure may have changed.")
         return
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    db = SessionLocal()
 
-    # Find job listings on Indeed
-    job_listings = soup.find_all("td", class_="resultContent")
-
-    db = SessionLocal()  # Open database session
     for job in job_listings:
-        # Extract Job Title
-        job_title = job.find("h2", class_="jobTitle")
-        title = job_title.span.text.strip() if job_title else "N/A"
+        time.sleep(random.uniform(1, 3))  # Simulate human-like pauses
 
-        # Extract Company Name
-        company = job.find("span", {"data-testid": "company-name"})
-        company_name = company.text.strip() if company else "N/A"
+        # Extract company name
+        company = job.find("a", {"data-id": "company-title"})
+        company_name = company.get_text(strip=True) if company else "N/A"
 
-        # Extract Location
-        location = job.find("div", {"data-testid": "text-location"})
-        job_location = location.text.strip() if location else "N/A"
+        # Extract job title
+        job_title = job.find("a", {"data-id": "job-card-title"})
+        title = job_title.get_text(strip=True) if job_title else "N/A"
 
-        # Extract Salary (if available)
-        salary_container = job.find("div", class_="metadata salary-snippet-container")
-        salary = salary_container.find("div", {"data-testid": "attribute_snippet_testid"}) if salary_container else None
-        salary_text = salary.text.strip() if salary else None
+            
+        location_icon = job.find("i", class_="fa-regular fa-location-dot")
+        job_location = "N/A"
+        if location_icon:
+            parent_div = clock_icon.find_parent("div")
+            if parent_div:
+                next_div = parent_div.find_next_sibling("div")
+                if next_div:
+                    location_span = next_div.find("span")
+                    if location_span:
+                        post_date_text = post_date_span.get_text(strip=True)
 
-        # Convert salary to an integer range if present
-        if salary_text and "-" in salary_text:
-            min_salary, max_salary = salary_text.replace("$", "").replace(",", "").split(" - ")
-            avg_salary = (int(min_salary) + int(max_salary)) // 2
-        elif salary_text:
-            avg_salary = int(salary_text.replace("$", "").replace(",", ""))
-        else:
-            avg_salary = None
+        # Extract posting date (using the clock icon)
+        clock_icon = job.find("i", class_="fa-regular fa-clock")
+        post_date_text = "N/A"
+        if clock_icon:
+            # Find the parent container of the clock icon
+            parent_div = clock_icon.find_parent("div")
+            if parent_div:
+                # Look for the next sibling div, which contains the posting date span
+                next_div = parent_div.find_next_sibling("div")
+                if next_div:
+                    post_date_span = next_div.find("span")
+                    if post_date_span:
+                        post_date_text = post_date_span.get_text(strip=True)
+                        
+        job_level = None
+        for span in job.find_all("span", class_="font-barlow text-gray-04"):
+            text = span.get_text(strip=True)
+            if "level" in text:
+                job_level = text
 
+        avg_salary = None
+        salary_text = None
+        for span in job.find_all("span", class_="font-barlow text-gray-04"):
+            text = span.get_text(strip=True)
+            if "Annually" in text and "K" in text:
+                salary_text = text
+                break
 
-        # Convert salary to an integer range if present
-        if salary_text and "-" in salary_text:
-            min_salary, max_salary = salary_text.replace("$", "").replace(",", "").split(" - ")
-            avg_salary = (int(min_salary) + int(max_salary)) // 2
-        elif salary_text:
-            avg_salary = int(salary_text.replace("$", "").replace(",", ""))
-        else:
-            avg_salary = None
+        if salary_text:
+            # Try to extract a range like "120K-258K"
+            salary_match = re.search(r'(\d+)K-(\d+)K', salary_text)
+            if salary_match:
+                min_salary = int(salary_match.group(1)) * 1000
+                max_salary = int(salary_match.group(2)) * 1000
+                avg_salary = (min_salary + max_salary) // 2
+            else:
+                # Fall back to a single salary figure if a range isn't found
+                single_salary_match = re.search(r'(\d+)K', salary_text)
+                if single_salary_match:
+                    avg_salary = int(single_salary_match.group(1)) * 1000
 
-        # Extract Job ID
-        job_id_tag = job.find("a", id=lambda x: x and x.startswith("job_"))
-        job_id = job_id_tag["id"] if job_id_tag else "N/A"
+        print(f"Scraped Job: {title} at {company_name}, Location: {job_location}, "
+              f"Posted: {post_date_text}, Level: {job_level}, Salary: {avg_salary}")
 
-        # Create a Job object
         job_entry = Job(
             company=company_name,
             title=title,
             salary=avg_salary,
             location=job_location,
-            job_type="Full-time",  # Modify as needed
+            job_type=job_level,
             post_date=datetime.today().date()
         )
-
-        # Add job to the database
         db.add(job_entry)
 
     db.commit()
     db.close()
     print("Job scraping complete!")
 
-# Run scraper
 if __name__ == "__main__":
     scrape_jobs()

@@ -28,6 +28,10 @@ def get_actual_date(post_date_text):
         return today - timedelta(days=days_ago)
     
     return None
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 def get_driver():
     chrome_options = Options()
@@ -35,11 +39,12 @@ def get_driver():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("--user-data-dir=/tmp/chrome_user_data")
     chrome_options.add_argument("--disable-gpu")
-    # Optionally remove --remote-debugging-port if it causes issues
 
-    service = Service('/home/ubuntu/chromedriver')  # Use your manually downloaded ChromeDriver path
+    # Let WebDriver Manager install and return the correct path
+    service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 

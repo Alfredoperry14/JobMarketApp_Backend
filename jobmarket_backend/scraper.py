@@ -30,7 +30,7 @@ def get_actual_date(post_date_text):
 def get_driver():
     """Set up Selenium Chrome WebDriver for EC2"""
     chrome_options = Options()
-    chrome_options.binary_location = "/opt/google/chrome/google-chrome"  # Set Chrome binary path
+    chrome_options.binary_location = "/usr/bin/google-chrome"
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")

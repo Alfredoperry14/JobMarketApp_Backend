@@ -93,7 +93,7 @@ def scrape_jobs():
                         if job_title_element and job_title_element.has_attr('href')
                         else "N/A")
             if job_link != "N/A" and not job_link.startswith("http"):
-                job_link = "https://www.builtinnyc.com" + job_link
+                job_link = "https://www.builtinnyc.com/jobs/dev-engineering?daysSinceUpdated=1&allLocations=true" + job_link
 
             existing_link = db.query(Job).filter(Job.job_link == job_link).first()
             if existing_link:

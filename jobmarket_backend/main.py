@@ -1,9 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-#from database import SessionLocal, init_db, Job
 from jobmarket_backend.database import SessionLocal, init_db, Job
-import schemas  # Import Pydantic models
-
+from jobmarket_backend import schemas
 app = FastAPI()
 
 # Initialize database (only needed once)

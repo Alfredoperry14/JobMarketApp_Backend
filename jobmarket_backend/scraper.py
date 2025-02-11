@@ -1,6 +1,7 @@
 import time
 import random
 import re
+import tempfile
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -14,51 +15,47 @@ from database import SessionLocal, Job
 def get_actual_date(post_date_text):
     """Convert a relative time string into an absolute date."""
     today = datetime.today().date()
-
     # Handle common cases
     if "Today" in post_date_text or "Just now" in post_date_text:
         return today
     elif "Yesterday" in post_date_text:
         return today - timedelta(days=1)
-
     # Look for patterns like "2 Days Ago" (or "2 Day Ago")
     match = re.search(r'(\d+)\s+day', post_date_text, re.IGNORECASE)
     if match:
         days_ago = int(match.group(1))
         return today - timedelta(days=days_ago)
-
     # For hours, assume it's still today
     match = re.search(r'(\d+)\s+hour', post_date_text, re.IGNORECASE)
     if match:
         return today  # Still the same day
-
-    # Fallback: if no pattern matched, default to today
+    # Fallback: default to today
     return today
 
 def scrape_jobs():
     base_url = "https://www.builtinnyc.com/jobs/dev-engineering?"
     page_number = 1
 
-    # Set up Chrome options for Heroku (using the defaults from the buildpacks)
+    # Set up Chrome options for Heroku
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("start-maximized")
     chrome_options.add_argument("disable-infobars")
     chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-    )
-    # Note: We are not using the --user-data-dir argument here
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
+    # Generate a unique temporary user data directory to avoid conflicts
+    user_data_dir = tempfile.mkdtemp()
+    chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
 
-    # Create the WebDriver (Heroku buildpacks install Chrome and Chromedriver in the expected locations)
+    # Create the WebDriver using the Heroku-installed Chrome/Chromedriver.
+    # The Heroku buildpacks install Chrome at /app/.apt/usr/bin/google-chrome
+    # and Chromedriver at /app/.chromedriver/bin/chromedriver.
     driver = webdriver.Chrome(options=chrome_options)
+    
     db = SessionLocal()
-
-    # Use a global counter if you want to commit across pages;
-    # if you prefer to restart the counter on each page, initialize it inside the loop.
-    job_count = 0
+    job_count = 0  # Global counter for commits
 
     while True:
         current_url = f"{base_url}&page={page_number}"
@@ -70,7 +67,7 @@ def scrape_jobs():
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-id='job-card']"))
             )
-            time.sleep(7)  # Extra wait for JavaScript to finish rendering
+            time.sleep(7)  # Extra wait for JavaScript rendering
         except Exception as e:
             print("Error waiting for job content to load:", e)
             break
@@ -88,6 +85,7 @@ def scrape_jobs():
         job_listings = soup.select("div[data-id='job-card']")
         print(f"Found {len(job_listings)} jobs on page {page_number}")
 
+        # If no job listings are found, end pagination.
         if len(job_listings) == 0:
             print("No more jobs found. Ending pagination.")
             break
@@ -107,7 +105,7 @@ def scrape_jobs():
             if job_link != "N/A" and not job_link.startswith("http"):
                 job_link = "https://www.builtinnyc.com" + job_link
 
-            # Skip job if it already exists in the database
+            # Check if job link already exists in DB
             existing_link = db.query(Job).filter(Job.job_link == job_link).first()
             if existing_link:
                 print(f"Job already exists in DB: {job_link}")
@@ -140,7 +138,7 @@ def scrape_jobs():
                 if "level" in text:
                     job_level = text
 
-            # Extract salary (if available)
+            # Extract salary
             avg_salary = None
             salary_text = None
             for span in job.find_all("span", class_="font-barlow text-gray-04"):

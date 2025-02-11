@@ -28,8 +28,12 @@ def get_actual_date(post_date_text):
     return None
 
 def get_driver():
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from webdriver_manager.chrome import ChromeDriverManager  # Optional, but useful for managing driver versions
+
     chrome_options = Options()
-    # Use the actual Chrome executable rather than the wrapper
+    # Point directly to the actual Chrome binary
     chrome_options.binary_location = "/opt/google/chrome/chrome"
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -38,7 +42,8 @@ def get_driver():
     chrome_options.add_argument("--user-data-dir=/tmp/chrome_user_data")
     chrome_options.add_argument("--disable-gpu")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    # Use WebDriver Manager to manage the ChromeDriver version (optional but recommended)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     return driver
 
 def scrape_jobs():

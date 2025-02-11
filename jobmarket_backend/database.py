@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Update this with your actual PostgreSQL credentials
-DATABASE_URL = "postgresql://postgres:ichab0d@localhost:5432/jobmarket"
+DATABASE_URL = "postgresql://admin:yourpassword@localhost:5432/jobmarket"
 
 # Create database engine
 engine = create_engine(DATABASE_URL)

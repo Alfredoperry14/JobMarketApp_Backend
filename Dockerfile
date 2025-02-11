@@ -5,7 +5,7 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       chromium \
       chromium-driver \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* && apt-get clean
 
 WORKDIR /app
 

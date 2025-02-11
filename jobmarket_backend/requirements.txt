@@ -1,0 +1,6 @@
+beautifulsoup4
+selenium
+webdriver-manager
+psycopg2
+sqlalchemy
+requests

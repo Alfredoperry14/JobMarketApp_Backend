@@ -48,7 +48,7 @@ def scrape_jobs():
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
     #chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--user-data-dir=/tmp/chrome_unique")
+    chrome_options.add_argument("--user-data-dir=/tmp/chrome_unique_" + str(random.randint(1000, 9999)))
     
     driver = webdriver.Chrome(options=chrome_options)
     db = SessionLocal()

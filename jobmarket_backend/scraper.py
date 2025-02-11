@@ -31,19 +31,15 @@ def get_actual_date(post_date_text):
 
 def get_driver():
     chrome_options = Options()
-    # Point directly to the actual Chrome binary
     chrome_options.binary_location = "/opt/google/chrome/chrome"
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("--user-data-dir=/tmp/chrome_user_data")
     chrome_options.add_argument("--disable-gpu")
+    # Optionally remove --remote-debugging-port if it causes issues
 
-    # Create a Service object with the path provided by ChromeDriverManager
-    service = Service(ChromeDriverManager().install())
-    
-    # Instantiate the Chrome driver using the service object and options
+    service = Service('/home/ubuntu/chromedriver')  # Use your manually downloaded ChromeDriver path
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 

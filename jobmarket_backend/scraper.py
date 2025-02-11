@@ -46,8 +46,6 @@ def scrape_jobs():
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36")
     # Generate a unique temporary user data directory to avoid conflicts
-    user_data_dir = tempfile.mkdtemp()
-    chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
 
     # Create the WebDriver using the Heroku-installed Chrome/Chromedriver.
     # (Heroku buildpacks install Chrome at /app/.apt/usr/bin/google-chrome

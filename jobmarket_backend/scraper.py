@@ -28,9 +28,9 @@ def get_actual_date(post_date_text):
     return None
 
 def get_driver():
-    """Set up Selenium Chrome WebDriver for EC2"""
     chrome_options = Options()
-    chrome_options.binary_location = "/opt/google/chrome/google-chrome"
+    # Use the actual Chrome executable rather than the wrapper
+    chrome_options.binary_location = "/opt/google/chrome/chrome"
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")

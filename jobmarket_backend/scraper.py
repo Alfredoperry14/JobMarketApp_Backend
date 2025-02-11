@@ -174,7 +174,10 @@ def scrape_jobs():
                 job_link=job_link  
             )
             db.add(job_entry)
-            db.flush()
+            job_count += 1
+            if job_count % 10 == 0:
+                print(f"Committing after processing {job_count} jobs on page {page_number}...")
+                session.commit()
 
         page_number += 1  # Move to the next page
 

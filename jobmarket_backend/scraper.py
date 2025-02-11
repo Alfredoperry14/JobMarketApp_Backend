@@ -50,8 +50,8 @@ def scrape_jobs():
     chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
 
     # Create the WebDriver using the Heroku-installed Chrome/Chromedriver.
-    # The Heroku buildpacks install Chrome at /app/.apt/usr/bin/google-chrome
-    # and Chromedriver at /app/.chromedriver/bin/chromedriver.
+    # (Heroku buildpacks install Chrome at /app/.apt/usr/bin/google-chrome
+    # and Chromedriver at /app/.chromedriver/bin/chromedriver.)
     driver = webdriver.Chrome(options=chrome_options)
     
     db = SessionLocal()

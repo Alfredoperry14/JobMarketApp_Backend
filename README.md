@@ -1,5 +1,4 @@
 # Job Market App
-- Link 
 ## Overview
 This **Job Market App** is a personal project that scrapes job postings from [Builtin NYC](http://builtinnyc.com) and allows users to:
 - Track **new software engineering job postings**.
@@ -72,22 +71,19 @@ The backend is built using **FastAPI + PostgreSQL** and deployed on an **AWS EC2
 
 This was a **great learning project**, and I'm looking forward to **building more!**
 
+---
 <p align="center">
   <img src="https://github.com/user-attachments/assets/4ce3bc9a-567a-4f14-a485-1df17a67de41" width="300">
   <img src="https://github.com/user-attachments/assets/999744e9-5eb9-4578-aa0e-dbcc37759dda" width="300">
   <img src="https://github.com/user-attachments/assets/54d71679-8890-4076-b77a-69a6e2d780bc" width="300">
-  <img src =" https://github.com/user-attachments/assets/5cf7e6b5-c56d-4aac-91e7-03905a64f8ba" width = "300">
+  <img src ="https://github.com/user-attachments/assets/6f63b260-260f-4228-b7cc-e70682eb8590" width = "300">
   <img src = "https://github.com/user-attachments/assets/6a6632b9-ba1f-4770-8360-3ecc147455a8" width = "300">
   <img src = "https://github.com/user-attachments/assets/85754cd5-0416-4449-a5d2-280687ea2b0b" width = "300">
-https://github.com/user-attachments/assets/8ab0e690-fd6b-4117-b675-1c9b595e627f
 
 </p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/5d8f1791-121b-4573-b568-9bb02a5392d1" width="300">
-  <a href="https://github.com/user-attachments/assets/fc35d173-ab03-4423-b18d-61ed82427d64">
-  </a>
+  <img src="https://github.com/user-attachments/assets/8ab0e690-fd6b-4117-b675-1c9b595e627f" width="300">
 </p>
 (Laggy because the video had to be compressed)
-
-

@@ -83,7 +83,8 @@ This was a **great learning project**, and I'm looking forward to **building mor
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5d8f1791-121b-4573-b568-9bb02a5392d1" width="300">
+  <img src="https://github.com/user-attachments/assets/06e8510a-1712-4111-af25-6e35fb94893b" width="300">
   <img src="https://github.com/user-attachments/assets/8ab0e690-fd6b-4117-b675-1c9b595e627f" width="300">
 </p>
 (Laggy because the video had to be compressed)
+
